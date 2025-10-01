@@ -3,7 +3,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://0.0.0.0:8006';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://blog.circuitnotion.com';
 
 export async function login(formData: FormData) {
   const email = formData.get('email') as string;

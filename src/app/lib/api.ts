@@ -1,5 +1,5 @@
 // lib/api.ts
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://0.0.0.0:8006';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://blog.circuitnotion.com';
 
 export interface User {
   id: number;
