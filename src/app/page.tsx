@@ -1,5 +1,5 @@
 // app/page.tsx
-import { blogAPI } from './lib/api';
+import { blogAPI, type Blog } from './lib/api';
 import BlogCard from './components/BlogCard';
 import Navbar from './components/Navbar';
 import type { Metadata } from 'next';
@@ -10,7 +10,16 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const blogs = await blogAPI.getBlogs();
+  let blogs: Blog[];
+  let errorMessage = '';
+  
+  try {
+    blogs = await blogAPI.getBlogs();
+  } catch (err) {
+    console.warn('API unavailable during build/render:', err);
+    blogs = [];
+    errorMessage = 'Unable to load latest posts. Please check back later.';
+  }
 
   return (
     <>
@@ -85,7 +94,20 @@ export default async function Home() {
               </p>
             </div>
 
-            {blogs.length === 0 ? (
+                        <div className="space-y-6">
+              {errorMessage && (
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6 text-center mb-8">
+                  <div className="flex justify-center mb-3">
+                    <svg className="w-8 h-8 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">Service Temporarily Unavailable</h3>
+                  <p className="text-yellow-700 dark:text-yellow-300">{errorMessage}</p>
+                </div>
+              )}
+
+              {blogs.length === 0 && !errorMessage ? (
               <div className="text-center py-20">
                 <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 rounded-full flex items-center justify-center">
                   <svg className="w-12 h-12 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +136,8 @@ export default async function Home() {
               </div>
             )}
           </div>
-        </section>
+        </div>
+      </section>
 
         {/* CTA Section */}
         <section className="bg-gradient-to-r from-gray-900 to-blue-900 dark:from-gray-950 dark:to-blue-950 text-white py-20">

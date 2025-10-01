@@ -40,23 +40,36 @@ class APIError extends Error {
 
 async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   try {
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    
     const res = await fetch(`${API_URL}${endpoint}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
+      signal: controller.signal,
     });
     
+    clearTimeout(timeoutId);
+    
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ detail: 'Unknown error' }));
-      throw new APIError(res.status, errorData.detail || `HTTP ${res.status}`);
+      const errorData = await res.json().catch(() => ({ detail: 'Server error occurred' }));
+      throw new APIError(res.status, errorData.detail || `Server returned ${res.status}`);
     }
     
     return res.json();
   } catch (error) {
     if (error instanceof APIError) throw error;
-    throw new APIError(0, 'Network error - please check your connection');
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new APIError(0, 'Request timed out. Please try again.');
+    }
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new APIError(0, 'Unable to connect to server. Please try again later.');
+    }
+    throw new APIError(0, 'Something went wrong. Please check your internet connection.');
   }
 }
 
@@ -65,8 +78,11 @@ export const blogAPI = {
     try {
       return await fetchAPI(`/blogs?skip=${skip}&limit=${limit}`, { cache: 'no-store' });
     } catch (error) {
-      console.error('Failed to fetch blogs:', error);
-      return []; // Return empty array instead of throwing
+      // Silently return empty array for build-time and graceful degradation
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('API unavailable during build:', error);
+      }
+      return [];
     }
   },
   
