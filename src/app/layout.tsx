@@ -9,7 +9,12 @@ export const metadata: Metadata = {
   title: 'BlogHub - Share Your Expertise',
   description: 'A platform for experts to share knowledge and insights',
   icons: {
-    icon: '/rwandablogs.png',
+    icon: [
+      { url: '/rwandablogs.png', type: 'image/png', sizes: 'any' },
+    ],
+    apple: [
+      { url: '/rwandablogs.png', type: 'image/png' },
+    ],
   },
 };
 
