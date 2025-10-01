@@ -36,7 +36,7 @@ export async function GET() {
       
       // Add each blog post to sitemap
       if (Array.isArray(blogs)) {
-        blogs.forEach((blog: any) => {
+        blogs.forEach((blog: { id: number; updated_at?: string; created_at?: string }) => {
           const lastMod = blog.updated_at || blog.created_at || now;
           xmlContent += `  <url>
     <loc>${siteUrl}/blog/${blog.id}</loc>
