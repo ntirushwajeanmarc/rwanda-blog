@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'BlogHub - Share Your Expertise',
   description: 'A platform for experts to share knowledge and insights',
+  icons: {
+    icon: '/rwandablogs.png',
+  },
 };
 
 export default function RootLayout({
