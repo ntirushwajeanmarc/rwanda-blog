@@ -25,7 +25,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
-    // Get theme from localStorage or default to system
     const savedTheme = localStorage.getItem('theme') as Theme | null;
     if (savedTheme) {
       setTheme(savedTheme);
@@ -33,45 +32,36 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const applyTheme = (nextTheme: Theme, prefersDark: boolean) => {
+      const nextResolved = nextTheme === 'system' ? (prefersDark ? 'dark' : 'light') : nextTheme;
+      setResolvedTheme(nextResolved);
+
+      const root = document.documentElement;
+      root.classList.remove('light', 'dark');
+      root.classList.add(nextResolved);
+      root.style.colorScheme = nextResolved;
+    };
+
+    applyTheme(theme, mediaQuery.matches);
+    localStorage.setItem('theme', theme);
+
+    const handleSystemThemeChange = (event: MediaQueryListEvent) => {
       if (theme === 'system') {
-        setResolvedTheme(e.matches ? 'dark' : 'light');
+        applyTheme('system', event.matches);
       }
     };
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    // Set initial resolved theme
-    if (theme === 'system') {
-      setResolvedTheme(mediaQuery.matches ? 'dark' : 'light');
-    } else {
-      setResolvedTheme(theme);
-    }
-
-    // Apply theme to document
-    const root = document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(resolvedTheme);
-    
-    // Save to localStorage
-    localStorage.setItem('theme', theme);
-
-    // Listen for system theme changes
     mediaQuery.addEventListener('change', handleSystemThemeChange);
 
     return () => {
       mediaQuery.removeEventListener('change', handleSystemThemeChange);
     };
-  }, [theme, resolvedTheme]);
+  }, [theme]);
 
-  const handleSetTheme = (newTheme: Theme) => {
-    setTheme(newTheme);
-    if (newTheme !== 'system') {
-      setResolvedTheme(newTheme);
-    } else {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      setResolvedTheme(mediaQuery.matches ? 'dark' : 'light');
-    }
+  const handleSetTheme = (nextTheme: Theme) => {
+    setTheme(nextTheme);
   };
 
   return (

@@ -16,7 +16,8 @@ export default function LoginForm() {
       if (result?.error) {
         setError(result.error);
       }
-    } catch (err) {
+    } catch (error) {
+      console.error('Login failed:', error);
       setError('Login failed. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -26,18 +27,18 @@ export default function LoginForm() {
   return (
     <form action={handleSubmit} className="space-y-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 animate-fade-in">
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-500/60 rounded-xl p-4 animate-fade-in">
           <div className="flex items-center gap-2">
             <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
-            <p className="text-red-800 font-medium">{error}</p>
+            <p className="text-red-800 dark:text-red-200 font-medium">{error}</p>
           </div>
         </div>
       )}
 
       <div>
-        <label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-2">
+        <label htmlFor="email" className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
           Email Address
         </label>
         <input
@@ -45,14 +46,14 @@ export default function LoginForm() {
           id="email"
           name="email"
           placeholder="Enter your email address"
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
           required
           disabled={isSubmitting}
         />
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-semibold text-gray-900 mb-2">
+        <label htmlFor="password" className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
           Password
         </label>
         <input
@@ -60,7 +61,7 @@ export default function LoginForm() {
           id="password"
           name="password"
           placeholder="Enter your password"
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
           required
           disabled={isSubmitting}
         />

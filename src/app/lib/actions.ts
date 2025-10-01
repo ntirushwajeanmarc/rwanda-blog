@@ -30,6 +30,7 @@ export async function login(formData: FormData) {
       maxAge: 60 * 60 * 24 * 7 // 7 days
     });
   } catch (error) {
+    console.error('Login error:', error);
     return { error: 'Invalid credentials or server connection failed' };
   }
   
@@ -77,6 +78,7 @@ export async function register(formData: FormData) {
       maxAge: 60 * 60 * 24 * 7
     });
   } catch (error) {
+    console.error('Registration error:', error);
     return { error: 'Registration failed or server connection failed' };
   }
   
@@ -109,6 +111,7 @@ export async function createBlog(formData: FormData) {
       body: JSON.stringify(data),
     });
   } catch (error) {
+    console.error('Blog creation error:', error);
     return { error: 'Failed to create blog' };
   }
   

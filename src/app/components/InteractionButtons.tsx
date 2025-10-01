@@ -79,14 +79,14 @@ export default function InteractionButtons({
       <button
         onClick={handleLike}
         disabled={liking}
-        className="flex items-center gap-2 px-6 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex items-center gap-2 px-6 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         👍 {liking ? 'Liking...' : `Like (${likes})`}
       </button>
       <button
         onClick={handleShare}
         disabled={sharing}
-        className="flex items-center gap-2 px-6 py-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex items-center gap-2 px-6 py-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-800/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         🔗 {sharing ? 'Sharing...' : `Share (${shares})`}
       </button>
