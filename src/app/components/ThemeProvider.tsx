@@ -20,18 +20,47 @@ export function useTheme() {
   return context;
 }
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('system');
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
-
-  useEffect(() => {
+function getInitialTheme(): Theme {
+  if (typeof window === 'undefined') return 'system';
+  
+  try {
     const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
+    if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
+      return savedTheme;
     }
+  } catch (e) {
+    console.error('Error reading theme from localStorage:', e);
+  }
+  
+  return 'system';
+}
+
+function getInitialResolvedTheme(): 'light' | 'dark' {
+  if (typeof window === 'undefined') return 'light';
+  
+  const savedTheme = getInitialTheme();
+  
+  if (savedTheme === 'system') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  
+  return savedTheme as 'light' | 'dark';
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(getInitialResolvedTheme);
+  const [mounted, setMounted] = useState(false);
+
+  // Mark as mounted on client side
+  useEffect(() => {
+    setMounted(true);
   }, []);
 
+  // Apply theme changes
   useEffect(() => {
+    if (!mounted) return;
+
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
     const applyTheme = (nextTheme: Theme, prefersDark: boolean) => {
@@ -42,10 +71,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.classList.remove('light', 'dark');
       root.classList.add(nextResolved);
       root.style.colorScheme = nextResolved;
+      
+      // Store the theme preference
+      try {
+        localStorage.setItem('theme', nextTheme);
+      } catch (e) {
+        console.error('Error saving theme to localStorage:', e);
+      }
     };
 
     applyTheme(theme, mediaQuery.matches);
-    localStorage.setItem('theme', theme);
 
     const handleSystemThemeChange = (event: MediaQueryListEvent) => {
       if (theme === 'system') {
@@ -58,7 +93,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => {
       mediaQuery.removeEventListener('change', handleSystemThemeChange);
     };
-  }, [theme]);
+  }, [theme, mounted]);
 
   const handleSetTheme = (nextTheme: Theme) => {
     setTheme(nextTheme);
